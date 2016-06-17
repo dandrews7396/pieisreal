@@ -775,6 +775,7 @@ class Mouse (Sprite):
     def _tick(self):
         x, y = Screen.mouse_position(self)
         self.move_to(x, y)
+        self.update()
 
 #------------------------------------------------------------------------------
 
