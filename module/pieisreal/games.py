@@ -94,14 +94,15 @@ class Screen:
     initialised = 0
     got_statics = 0
 
-    def __init__ (self, width=640, height=480):
+    def __init__ (self, width=640, height=480, fps = 50):
 
-        self.init_screen (width, height)
+        self.init_screen (width, height, fps)
 
-    def init_screen (self, width=640, height=480):
+    def init_screen (self, width, height, fps):
         """
         width -- width of graphics window
         height -- height of graphics window
+        fps -- target frame rate for graphics window
         """
 
         # Bomb if you try this more than once: pygame can only have one
@@ -115,6 +116,7 @@ class Screen:
         self._display = pygame.display.set_mode ((width, height), HWSURFACE)
         self._width = width
         self._height = height
+        self._fps = fps
         self._background = self._display.convert ()
 
         # Initialise a list of objects in play
@@ -271,18 +273,16 @@ class Screen:
         pygame.display.update (self._dirtyrects)
         self._dirtyrects = []
 
-    def mainloop (self, fps = 50):
+    def mainloop (self):
         """
         Run the pygame main loop. This will animate the objects on the
         screen and call their tick methods every tick.
-
-        fps -- target frame rate
         """
 
         self._exit = 0
 
         while not self._exit:
-            self._wait_frame (fps)
+            self._wait_frame ()
 
             for object in self._objects:
                 if not object._static:
@@ -315,12 +315,12 @@ class Screen:
         # Throw away any pending events.
         pygame.event.get()
 
-    def _wait_frame (self, fps):
+    def _wait_frame (self):
         "Wait for the correct fps time to expire"
         this_tick = pygame.time.get_ticks()
         if this_tick < self._next_tick:
             pygame.time.delay(int(self._next_tick+0.5) - this_tick)
-        self._next_tick = this_tick + (1000./fps)
+        self._next_tick = this_tick + (1000./self._fps)
 
     def overlapping_objects (self, rectangle):
         """
@@ -831,7 +831,7 @@ class Text(Object, ColorMixin):
 
         self.init_text (screen, x, y, text, size, color, static)
 
-    def init_text (self, screen, x, y, text, size, color, static=0):
+    def init_text (self, screen, x, y, text, size, color, static):
         """
         Arguments:
 
@@ -883,8 +883,8 @@ class Polygon (Object, ColorMixin, OutlineMixin):
         self.init_polygon(
             screen, x, y, shape, color, filled, outline, static, thickness)
 
-    def init_polygon(self, screen, x, y, shape, color, filled=True,
-                     outline=None, static=0, thickness=1):
+    def init_polygon(self, screen, x, y, shape, color, filled,
+                     outline, static, thickness):
         """
         Arguments:
 
@@ -987,8 +987,8 @@ class Circle (Object, ColorMixin, OutlineMixin):
                  outline=None, static=0):
         self.init_circle (screen, x, y, radius, color, filled, outline, static)
 
-    def init_circle(self, screen, x, y, radius, color, filled=True,
-                    outline=None, static=0):
+    def init_circle(self, screen, x, y, radius, color, filled,
+                    outline, static):
 
         self._color = colour
         self._outline = outline
@@ -1000,7 +1000,7 @@ class Circle (Object, ColorMixin, OutlineMixin):
 
         Object.__init__ (self, screen, x, y, self._create_surface (),
                          a=0, x_offset=-radius, y_offset=-radius,
-                         static=static)
+                         static)
 
     def _create_surface (self):
 
@@ -1068,7 +1068,7 @@ class Timer:
     def __init__ (self, interval = 1, running = 1):
         self.init_timer (interval)
 
-    def init_timer (self, interval = 1, running = 1):
+    def init_timer (self, interval, running):
         """
         Call this function to start the timer. You must call it after
         the Object's init function.
@@ -1156,7 +1156,7 @@ class Message (Text, Timer):
         self.init_message (screen, x, y, text, size, color, lifetime,
         after_death)
 
-    def init_message (self, screen, x, y, text, size, color, lifetime, after_death=None):
+    def init_message (self, screen, x, y, text, size, color, lifetime, after_death):
         """
         Arguments:
 
