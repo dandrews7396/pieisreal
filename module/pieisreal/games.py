@@ -518,11 +518,11 @@ class Object:
         self._orig_rect = surface.get_rect()
 
         # Offset from reference point to top left corner.
-        self._x_offset_ = self._x_offset = x_offset
+        self._x_offset_ = self._x_offset = x_offset
         self._y_offset_ = self._y_offset = y_offset
 
         self._rect = self._surface.get_rect ()
-        self._x = 0
+        self._x = 0
         self._y = 0
         self.move_to (x,y)
 
@@ -1248,6 +1248,16 @@ class Animation (Sprite, Timer):
         else: self.replace_image(new_image)
 
 #------------------------------------------------------------------------------
+
+class Keyboard(object):
+    """A class to get inputs from the keyboard."""
+
+    def is_pressed(self, key):
+        """detects keypresses, must be passed pygame.key constants in form of games.K_"""
+        return pygame.key.get_pressed()[key]
+
+#------------------------------------------------------------------------------
+
 
 ###############################################################################
 ## Utility functions
